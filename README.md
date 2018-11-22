@@ -1,2 +1,6 @@
-# binson-go
-Go lang implemnetation of Binson.
+binson-go
+=========
+
+Go implementation of Binson (www.binson.com).
+
+
