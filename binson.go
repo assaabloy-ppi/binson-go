@@ -285,8 +285,10 @@ func (d *Decoder) parseValue(sigByte byte, afterValueState int) {
 		d.Value = sigByte == sigTrue
 		d.state = afterValueState
 	case sigDouble:
+		var d64 float64
 		d.ValueType = Double
-		d.err = binary.Read(d.r, binary.LittleEndian, &d.Value)
+		d.err = binary.Read(d.r, binary.LittleEndian, &d64)
+		d.Value = d64
 		d.state = afterValueState
 	case sigInteger1, sigInteger2, sigInteger4, sigInteger8:
 		d.ValueType = Integer

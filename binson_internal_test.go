@@ -46,6 +46,20 @@ var boolTable = []struct {
 	{false, []byte("\x45")},
 }
 
+// Binson DOUBLE internal representation test data table
+var doubleTable = []struct {
+	val float64
+	raw []byte
+}{
+	{0.0, []byte("\x46\x00\x00\x00\x00\x00\x00\x00\x00")},
+	{math.Copysign(0, -1), []byte("\x46\x00\x00\x00\x00\x00\x00\x00\x80")},
+	{+3.1415e+10, []byte("\x46\x00\x00\x00\x6f\xeb\x41\x1d\x42")},
+	{-3.1415e-10, []byte("\x46\xfc\x17\xac\xd2\x95\x96\xf5\xbd")},
+	{math.NaN(), []byte("\x46\x00\x00\x00\x00\x00\x00\xf8\x7f")},
+	{math.Inf(+1), []byte("\x46\x00\x00\x00\x00\x00\x00\xf0\x7f")},
+	{math.Inf(-1), []byte("\x46\x00\x00\x00\x00\x00\x00\xf0\xff")},
+}
+
 func TestTableInts(t *testing.T) {
 	for _, record := range intTable {
 		var b bytes.Buffer
@@ -92,6 +106,31 @@ func TestTableBooleans(t *testing.T) {
 
 		if record.val != dec.Value {
 			t.Errorf("Binson boolean decoder failed: expected %v != recieved: %v", record.val, dec.Value)
+		}
+	}
+}
+
+func TestTableDoubles(t *testing.T) {
+	for _, record := range doubleTable {
+		var b bytes.Buffer
+
+		// test Encoder
+		enc := NewEncoder(&b)
+		enc.Double(record.val)
+		enc.Flush()
+		if !bytes.Equal(record.raw, b.Bytes()) && !math.IsNaN(record.val) {
+			t.Errorf("Binson double encoder failed: val %v, expected 0x%v != recieved: 0x%v",
+				record.val, hex.EncodeToString(record.raw), hex.EncodeToString(b.Bytes()))
+		}
+
+		// test Decoder
+		var rd = bytes.NewReader(record.raw)
+		var dec = NewDecoder(rd)
+		typeBeforeValue, _ := rd.ReadByte()
+		dec.parseValue(typeBeforeValue, 0)
+
+		if record.val != dec.Value && !math.IsNaN(record.val) {
+			t.Errorf("Binson double decoder failed: expected %v != recieved: %v", record.val, dec.Value)
 		}
 	}
 }
