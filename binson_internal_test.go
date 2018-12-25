@@ -1,3 +1,4 @@
+// Test internal (private) serialization / deserialization routines
 package binson
 
 import (
@@ -58,6 +59,26 @@ var doubleTable = []struct {
 	{math.NaN(), []byte("\x46\x00\x00\x00\x00\x00\x00\xf8\x7f")},
 	{math.Inf(+1), []byte("\x46\x00\x00\x00\x00\x00\x00\xf0\x7f")},
 	{math.Inf(-1), []byte("\x46\x00\x00\x00\x00\x00\x00\xf0\xff")},
+}
+
+// Binson STRING internal representation test data table
+var stringTable = []struct {
+	val string
+	raw []byte
+}{
+	{"", []byte("\x14\x00")},
+	{"abc", []byte("\x14\x03\x61\x62\x63")},
+	{"größer", []byte("\x14\x08\x67\x72\xc3\xb6\xc3\x9f\x65\x72")},
+}
+
+// Binson BYTES internal representation test data table
+var bytesTable = []struct {
+	val []byte
+	raw []byte
+}{
+	{[]byte(""), []byte("\x18\x00")},
+	{[]byte("\x00"), []byte("\x18\x01\x00")},
+	{[]byte("\x00\x01\x02\xff\x00"), []byte("\x18\x05\x00\x01\x02\xff\x00")},
 }
 
 func TestTableInts(t *testing.T) {
@@ -131,6 +152,57 @@ func TestTableDoubles(t *testing.T) {
 
 		if record.val != dec.Value && !math.IsNaN(record.val) {
 			t.Errorf("Binson double decoder failed: expected %v != recieved: %v", record.val, dec.Value)
+		}
+	}
+}
+
+func TestTableStrings(t *testing.T) {
+	for _, record := range stringTable {
+		var b bytes.Buffer
+
+		// test Encoder
+		enc := NewEncoder(&b)
+		enc.String(record.val)
+		enc.Flush()
+		if !bytes.Equal(record.raw, b.Bytes()) {
+			t.Errorf("Binson string encoder failed: val %v, expected 0x%v != recieved: 0x%v",
+				record.val, hex.EncodeToString(record.raw), hex.EncodeToString(b.Bytes()))
+		}
+
+		// test Decoder
+		var rd = bytes.NewReader(record.raw)
+		var dec = NewDecoder(rd)
+		typeBeforeValue, _ := rd.ReadByte()
+		dec.parseValue(typeBeforeValue, 0)
+
+		if record.val != dec.Value {
+			t.Errorf("Binson string decoder failed: expected %v != recieved: %v", record.val, dec.Value)
+		}
+	}
+}
+
+func TestTableBytes(t *testing.T) {
+	for _, record := range bytesTable {
+		var b bytes.Buffer
+
+		// test Encoder
+		enc := NewEncoder(&b)
+		enc.Bytes(record.val)
+		enc.Flush()
+		if !bytes.Equal(record.raw, b.Bytes()) {
+			t.Errorf("Binson bytes encoder failed: val %v, expected 0x%v != recieved: 0x%v",
+				record.val, hex.EncodeToString(record.raw), hex.EncodeToString(b.Bytes()))
+		}
+
+		// test Decoder
+		var rd = bytes.NewReader(record.raw)
+		var dec = NewDecoder(rd)
+		typeBeforeValue, _ := rd.ReadByte()
+		dec.parseValue(typeBeforeValue, 0)
+
+		if !bytes.Equal(record.val, dec.Value.([]byte)) {
+			t.Errorf("Binson bytes decoder failed: expected %v != recieved: %v",
+				hex.EncodeToString(record.val), hex.EncodeToString(dec.Value.([]byte)))
 		}
 	}
 }
