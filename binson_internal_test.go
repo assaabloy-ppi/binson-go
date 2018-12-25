@@ -7,6 +7,7 @@ import (
 	"testing"
 )
 
+// Binson INTEGER internal representation test data table
 var intTable = []struct {
 	val int64
 	raw []byte
@@ -36,6 +37,15 @@ var intTable = []struct {
 	{math.MinInt64, []byte("\x13\x00\x00\x00\x00\x00\x00\x00\x80")},
 }
 
+// Binson BOOLEAN internal representation test data table
+var boolTable = []struct {
+	val bool
+	raw []byte
+}{
+	{true, []byte("\x44")},
+	{false, []byte("\x45")},
+}
+
 func TestTableInts(t *testing.T) {
 	for _, record := range intTable {
 		var b bytes.Buffer
@@ -57,6 +67,31 @@ func TestTableInts(t *testing.T) {
 
 		if record.val != dec.Value {
 			t.Errorf("Binson int decoder failed: expected %v != recieved: %v", record.val, dec.Value)
+		}
+	}
+}
+
+func TestTableBooleans(t *testing.T) {
+	for _, record := range boolTable {
+		var b bytes.Buffer
+
+		// test Encoder
+		enc := NewEncoder(&b)
+		enc.Bool(record.val)
+		enc.Flush()
+		if !bytes.Equal(record.raw, b.Bytes()) {
+			t.Errorf("Binson boolean encoder failed: val %v, expected 0x%v != recieved: 0x%v",
+				record.val, hex.EncodeToString(record.raw), hex.EncodeToString(b.Bytes()))
+		}
+
+		// test Decoder
+		var rd = bytes.NewReader(record.raw)
+		var dec = NewDecoder(rd)
+		typeBeforeValue, _ := rd.ReadByte()
+		dec.parseValue(typeBeforeValue, 0)
+
+		if record.val != dec.Value {
+			t.Errorf("Binson boolean decoder failed: expected %v != recieved: %v", record.val, dec.Value)
 		}
 	}
 }
