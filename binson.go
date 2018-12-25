@@ -50,7 +50,7 @@ const twoBytes byte = 0x01
 const fourBytes byte = 0x02
 const eightBytes byte = 0x03
 
-var intSizeMap = [...]int{oneByte: 1, twoBytes: 2, fourBytes: 4, eightBytes: 8}
+//var intSizeMap = [...]int{oneByte: 1, twoBytes: 2, fourBytes: 4, eightBytes: 8}
 
 const twoTo7 int64 = 128
 const twoTo15 int64 = 32768
@@ -76,15 +76,7 @@ type Decoder struct {
 	Value     interface{}
 	ValueType ValueType
 
-	//booleanValue bool
-	//integerValue int64
-	//doubleValue  float64
-	//stringValue  string
-	//bytesValue   []byte
-
-	state int
-	//buffer bytes.Buffer
-	//offset int
+	state   int
 	sigByte byte // temp
 }
 
@@ -391,6 +383,11 @@ type Encoder struct {
 // NewEncoder returns a new encoder that writes to w, with buffering
 func NewEncoder(w io.Writer) *Encoder {
 	return &Encoder{w: bufio.NewWriter(w)}
+}
+
+// Flush encoder buffers
+func (e *Encoder) Flush() {
+	e.w.Flush()
 }
 
 // Begin writes OBJECT begin signature to output stream
