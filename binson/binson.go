@@ -90,15 +90,17 @@ func NewDecoder(r io.Reader) *Decoder {
 
 // Field parses until an expected field with the given name is found
 // (without considering fields of inner objects).
-func (d *Decoder) Field(name string) {
+func (d *Decoder) Field(name string) bool {
 	for d.NextField() {
 		if d.err != nil {
-			return
+			return false
 		}
 		if name == d.Name {
-			return
+			return true
 		}
 	}
+
+	return false
 }
 
 // NextField reads next field, returns true if a field was found and false
