@@ -2,14 +2,16 @@ binson-go
 =================
 
 A light-weight one-file Golang implementation of a Binson parser (decoder) and writer (encoder).
-Binson is like JSON, but faster, binary and even simpler. See [binson.org](http://binson.org/).
+
+Binson is like JSON, but faster, binary and even simpler.
+See [binson.org](http://binson.org/).
 
 This library is Golang port of the Java lib: [github.com/franslundberg/binson-java-light](https://github.com/franslundberg/binson-java-light).
 
 Install
 -------
 
-Just add new import string "github.com/assaabloy-ppi/binson-go/binson" to your import list,
+Just add new import string `"github.com/assaabloy-ppi/binson-go/binson"` to your import list,
 `go build` command will do the rest.
 
 Code examples
