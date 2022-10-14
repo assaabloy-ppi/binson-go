@@ -13,11 +13,8 @@ func TestEncoderEmptyBinsonObject(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.Begin()
 	e.End()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -30,11 +27,8 @@ func TestEncoderEmptyBinsonArray(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.BeginArray()
 	e.EndArray()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -47,14 +41,11 @@ func TestEncoderEmptyBinsonArray2(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.Begin()
 	e.Name("")
 	e.BeginArray()
 	e.EndArray()
 	e.End()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -67,13 +58,10 @@ func TestEncoderObjectWithUTF8Name(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.Begin()
 	e.Name("爅웡")
 	e.Integer(123)
 	e.End()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -87,7 +75,6 @@ func TestEncoderNestedObjectsWithEmptyKeyNames(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.Begin()
 	e.Name("")
 	e.Begin()
@@ -99,8 +86,6 @@ func TestEncoderNestedObjectsWithEmptyKeyNames(t *testing.T) {
 	e.End()
 	e.End()
 	e.End()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -114,7 +99,6 @@ func TestEncoderNestedArraysAsObjectValue(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.Begin()
 	e.Name("b")
 	e.BeginArray()
@@ -124,8 +108,6 @@ func TestEncoderNestedArraysAsObjectValue(t *testing.T) {
 	e.EndArray()
 	e.EndArray()
 	e.End()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -139,7 +121,6 @@ func TestEncoderNestedStructures1AsObjectValue(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.Begin()
 	e.Name("b")
 	e.BeginArray()
@@ -151,8 +132,6 @@ func TestEncoderNestedStructures1AsObjectValue(t *testing.T) {
 	e.EndArray()
 	e.EndArray()
 	e.End()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -166,7 +145,6 @@ func TestEncoderNestedStructures2AsObjectValue(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.Begin()
 	e.Name("b")
 	e.BeginArray()
@@ -180,8 +158,6 @@ func TestEncoderNestedStructures2AsObjectValue(t *testing.T) {
 	e.EndArray()
 	e.EndArray()
 	e.End()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -195,7 +171,6 @@ func TestEncoderComplexObjectStructure1(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.Begin()
 	e.Name("abc")
 	e.Begin()
@@ -210,8 +185,6 @@ func TestEncoderComplexObjectStructure1(t *testing.T) {
 	e.End()
 	e.End()
 	e.End()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -230,7 +203,6 @@ func TestEncoderComplexObjectStructure2(t *testing.T) {
 	var b bytes.Buffer
 	var e = NewEncoder(&b)
 
-	// ----
 	e.Begin()
 	e.Name("b")
 	e.BeginArray()
@@ -248,8 +220,6 @@ func TestEncoderComplexObjectStructure2(t *testing.T) {
 	e.Integer(9223372036854775807)
 	e.EndArray()
 	e.End()
-	// ----
-
 	e.Flush()
 
 	if !bytes.Equal(exp, b.Bytes()) {
@@ -261,10 +231,8 @@ func TestDecoderObjectEmpty(t *testing.T) {
 	var b = bytes.NewBuffer([]byte("\x40\x41")) // {}
 	var d = NewDecoder(b)
 
-	// ----
 	gotField := d.NextField()
 	assert.Equal(t, false, gotField)
-	// ----
 
 	if d.err != nil {
 		t.Errorf("Binson decoder error: %v", d.err)
@@ -276,7 +244,6 @@ func TestDecoder0(t *testing.T) {
 	var b = bytes.NewBuffer([]byte("\x40\x14\x03\x63\x69\x64\x10\x26\x14\x01\x7a\x40\x41\x41"))
 	var d = NewDecoder(b)
 
-	// ----
 	gotField := d.NextField()
 	assert.Equal(t, true, gotField)
 	assert.Equal(t, Integer, d.ValueType)
@@ -290,7 +257,6 @@ func TestDecoder0(t *testing.T) {
 
 	gotField = d.NextField()
 	assert.Equal(t, false, gotField)
-	// ----
 
 	if d.err != nil {
 		t.Errorf("Binson decoder error: %v", d.err)
@@ -302,7 +268,6 @@ func TestDecoderNested1(t *testing.T) {
 	var b = bytes.NewBuffer([]byte("\x40\x14\x01\x61\x40\x14\x01\x62\x10\x02\x41\x41"))
 	var d = NewDecoder(b)
 
-	// ----
 	gotField := d.NextField()
 	assert.Equal(t, true, gotField)
 	assert.Equal(t, Object, d.ValueType)
@@ -318,7 +283,6 @@ func TestDecoderNested1(t *testing.T) {
 
 	gotField = d.NextField()
 	assert.Equal(t, false, gotField)
-	// ----
 
 	if d.err != nil {
 		t.Errorf("Binson decoder error: %v", d.err)
@@ -330,7 +294,6 @@ func TestDecoderExample4a(t *testing.T) {
 	var b = bytes.NewBuffer([]byte("\x40\x14\x01\x61\x10\x01\x14\x01\x62\x40\x14\x01\x63\x10\x03\x41\x14\x01\x64\x10\x04\x41"))
 	var d = NewDecoder(b)
 
-	// ----
 	gotField := d.NextField()
 	assert.Equal(t, true, gotField)
 	assert.Equal(t, "a", d.Name)
@@ -358,7 +321,6 @@ func TestDecoderExample4b(t *testing.T) {
 	var b = bytes.NewBuffer([]byte("\x40\x14\x01\x61\x10\x01\x14\x01\x62\x40\x14\x01\x63\x10\x03\x41\x14\x01\x64\x10\x04\x41"))
 	var d = NewDecoder(b)
 
-	// ----
 	gotField := d.NextField()
 	gotField = d.NextField()
 
@@ -375,7 +337,6 @@ func TestDecoderExample4b(t *testing.T) {
 	assert.Equal(t, int64(4), d.Value)
 
 	assert.Equal(t, false, d.NextField())
-	// ----
 
 	if d.err != nil {
 		t.Errorf("Binson decoder error: %v", d.err)
@@ -387,7 +348,6 @@ func TestDecoderExample4c(t *testing.T) {
 	var b = bytes.NewBuffer([]byte("\x40\x14\x01\x61\x10\x01\x14\x01\x62\x40\x14\x01\x63\x10\x03\x41\x14\x01\x64\x10\x04\x41"))
 	var d = NewDecoder(b)
 
-	// ----
 	d.Field("b")
 	d.GoIntoObject()
 	d.Field("c")
@@ -395,7 +355,6 @@ func TestDecoderExample4c(t *testing.T) {
 	d.GoUpToObject()
 	d.Field("d")
 	assert.Equal(t, int64(4), d.Value)
-	// ----
 
 	if d.err != nil {
 		t.Errorf("Binson decoder error: %v", d.err)
@@ -415,7 +374,6 @@ func TestDecoderExampleArray1(t *testing.T) {
 	var b = bytes.NewBuffer([]byte("\x40\x14\x01\x61\x42\x10\x01\x14\x05\x68\x65\x6c\x6c\x6f\x43\x41"))
 	var d = NewDecoder(b)
 
-	// ----
 	d.Field("a")
 	d.GoIntoArray()
 
@@ -430,7 +388,6 @@ func TestDecoderExampleArray1(t *testing.T) {
 	assert.Equal(t, "hello", d.Value)
 
 	d.GoUpToArray()
-	// ----
 
 	if d.err != nil {
 		t.Errorf("Binson decoder error: %v", d.err)
@@ -442,7 +399,6 @@ func TestDecoderSkipArrayFields(t *testing.T) {
 	var b = bytes.NewBuffer([]byte("\x40\x14\x01\x61\x10\x01\x14\x01\x62\x42\x10\x0a\x10\x14\x43\x14\x01\x63\x10\x03\x41"))
 	var d = NewDecoder(b)
 
-	// ----
 	d.Field("a")
 	assert.Equal(t, Integer, d.ValueType)
 	assert.Equal(t, int64(1), d.Value)
@@ -450,7 +406,6 @@ func TestDecoderSkipArrayFields(t *testing.T) {
 	d.Field("c")
 	assert.Equal(t, Integer, d.ValueType)
 	assert.Equal(t, int64(3), d.Value)
-	// ----
 
 	if d.err != nil {
 		t.Errorf("Binson decoder error: %v", d.err)
@@ -462,7 +417,6 @@ func TestDecoderFieldInTheMiddle1(t *testing.T) {
 	var b = bytes.NewBuffer([]byte("\x40\x14\x01\x61\x10\x01\x14\x01\x62\x42\x10\x0a\x10\x14\x43\x14\x01\x63\x10\x03\x41"))
 	var d = NewDecoder(b)
 
-	// ----
 	d.Field("b")
 	d.GoIntoArray()
 
@@ -475,7 +429,6 @@ func TestDecoderFieldInTheMiddle1(t *testing.T) {
 	d.GoUpToObject()
 	d.Field("c")
 	assert.Equal(t, int64(3), d.Value)
-	// ----
 
 	if d.err != nil {
 		t.Errorf("Binson decoder error: %v", d.err)
@@ -490,7 +443,6 @@ func TestDecoderArrayInArray1(t *testing.T) {
 	))
 	var d = NewDecoder(b)
 
-	// ----
 	d.Field("b")
 	d.GoIntoArray()
 
@@ -519,7 +471,6 @@ func TestDecoderArrayInArray1(t *testing.T) {
 	assert.Equal(t, true, gotValue)
 	assert.Equal(t, Integer, d.ValueType)
 	assert.Equal(t, int64(20), d.Value)
-	// ----
 
 	if d.err != nil {
 		t.Errorf("Binson decoder error: %v", d.err)
