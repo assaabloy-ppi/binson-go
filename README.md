@@ -1,5 +1,5 @@
 binson-go
-=================
+=========
 
 A light-weight one-file Golang implementation of a Binson parser (decoder) and writer (encoder).
 
@@ -8,14 +8,16 @@ See [binson.org](https://binson.org/).
 
 This library is Golang port of the Java lib: [github.com/franslundberg/binson-java-light](https://github.com/franslundberg/binson-java-light).
 
-Install
--------
 
-Just add new import string `"github.com/assaabloy-ppi/binson-go/binson"` to your import list,
-`go build` command will do the rest.
 
-Code examples
--------
+## Install
+
+Just add '"github.com/assaabloy-ppi/binson-go/binson"` to your import list,
+your build tool will do the rest. 
+
+
+
+## Code examples
 
 Useful code examples. The source code is also available from 
 `binson-go/blob/master/examples/examples.go`.
@@ -114,3 +116,4 @@ fmt.Println(gotValue)                     // -> true
 fmt.Println(binson.String == d.ValueType) // -> true
 fmt.Println(d.Value)                      // -> hello
 ```
+
