@@ -42,6 +42,26 @@ func TestEncoderEmptyBinsonArray(t *testing.T) {
 	}
 }
 
+func TestEncoderEmptyBinsonArray2(t *testing.T) {
+	var exp = []byte("\x40\x14\x00\x42\x43\x41") // {""=[]}
+	var b bytes.Buffer
+	var e = NewEncoder(&b)
+
+	// ----
+	e.Begin()
+	e.Name("")
+	e.BeginArray()
+	e.EndArray()
+	e.End()
+	// ----
+
+	e.Flush()
+
+	if !bytes.Equal(exp, b.Bytes()) {
+		t.Errorf("Binson encoder failure: expected 0x%v", hex.EncodeToString(exp))
+	}
+}
+
 func TestEncoderObjectWithUTF8Name(t *testing.T) {
 	var exp = []byte("\x40\x14\x06\xe7\x88\x85\xec\x9b\xa1\x10\x7b\x41") // {"爅웡":123}
 	var b bytes.Buffer
