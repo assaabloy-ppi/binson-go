@@ -6,8 +6,11 @@ A light-weight one-file Golang implementation of a Binson parser (decoder) and w
 Binson is like JSON, but faster, binary and even simpler.
 See [binson.org](https://binson.org/).
 
-This library is Golang port of the Java lib: [github.com/franslundberg/binson-java-light](https://github.com/franslundberg/binson-java-light).
+This library is a Go port of the Java lib: [github.com/franslundberg/binson-java-light](https://github.com/franslundberg/binson-java-light).
 
+For a Go library that handle whole Binson object in memory, see
+[github.com/hakanols/binson-go](https://github.com/hakanols/binson-go)
+by Håkan Olsson.
 
 
 ## Install
