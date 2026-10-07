@@ -139,7 +139,7 @@ func TestTableDoubles(t *testing.T) {
 		enc := NewEncoder(&b)
 		enc.Double(record.val)
 		enc.Flush()
-		if !bytes.Equal(record.raw, b.Bytes()) && !math.IsNaN(record.val) {
+		if !bytes.Equal(record.raw, b.Bytes()) {
 			t.Errorf("Binson double encoder failed: val %v, expected 0x%v != recieved: 0x%v",
 				record.val, hex.EncodeToString(record.raw), hex.EncodeToString(b.Bytes()))
 		}
@@ -152,6 +152,27 @@ func TestTableDoubles(t *testing.T) {
 
 		if record.val != dec.Value && !math.IsNaN(record.val) {
 			t.Errorf("Binson double decoder failed: expected %v != recieved: %v", record.val, dec.Value)
+		}
+	}
+}
+
+// Every NaN must be written as 0x7ff8000000000000 (BINSON-SPEC-1.1).
+func TestNaNCanonical(t *testing.T) {
+	want := []byte("\x46\x00\x00\x00\x00\x00\x00\xf8\x7f")
+	nans := []uint64{
+		0x7ff8000000000001, // Go math.NaN()
+		0xfff8000000000000, // x86 0.0/0.0
+		0x7ff0000000000001, // signaling NaN
+		0xffffffffffffffff,
+	}
+	for _, bits := range nans {
+		var b bytes.Buffer
+		enc := NewEncoder(&b)
+		enc.Double(math.Float64frombits(bits))
+		enc.Flush()
+		if !bytes.Equal(want, b.Bytes()) {
+			t.Errorf("NaN 0x%016x: expected 0x%v != recieved: 0x%v",
+				bits, hex.EncodeToString(want), hex.EncodeToString(b.Bytes()))
 		}
 	}
 }

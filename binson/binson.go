@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"io"
+	"math"
 )
 
 // ValueType is type signature for each binson item
@@ -428,10 +429,19 @@ func (e *Encoder) Integer(val int64) {
 	e.writeIntegerOrLength(sigInteger1, val)
 }
 
-// Double writes float64 value to output stream
+// canonicalNaN is the bit pattern BINSON-SPEC-1.1 recommends for NaN
+// (a positive, quiet NaN). Go's math.NaN() is 0x7ff8000000000001.
+const canonicalNaN uint64 = 0x7ff8000000000000
+
+// Double writes float64 value to output stream. All NaN values are
+// written as canonicalNaN.
 func (e *Encoder) Double(val float64) {
+	bits := math.Float64bits(val)
+	if math.IsNaN(val) {
+		bits = canonicalNaN
+	}
 	e.w.WriteByte(sigDouble)
-	binary.Write(e.w, binary.LittleEndian, val)
+	binary.Write(e.w, binary.LittleEndian, bits)
 }
 
 // String writes string value to output stream
